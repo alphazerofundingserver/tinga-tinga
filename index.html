@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tinga Tinga New</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #050a0f;
+    --card: #0b141d;
+    --border: #0f4a3c;
+    --green: #00ff88;
+    --green-dim: #00c966;
+    --green-glow: rgba(0,255,136,0.15);
+    --green-glow2: rgba(0,255,136,0.05);
+    --text: #e0f0e8;
+    --muted: #4a7060;
+    --accent: #00ffcc;
+    --danger: #ff4466;
+    --gold: #ffd700;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page { display: none; min-height: 100vh; position: relative; z-index: 1; }
+  .page.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+
+  .brand { text-align: center; margin-bottom: 36px; }
+  .brand-tag {
+    font-size: 11px; letter-spacing: 6px; color: var(--green);
+    text-transform: uppercase; opacity: 0.7; margin-bottom: 6px;
+  }
+  .brand-name {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 900; color: var(--green);
+    text-shadow: 0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2);
+    letter-spacing: 3px; line-height: 1;
+  }
+  .brand-name span { color: var(--accent); }
+  .brand-sub {
+    font-family: 'Orbitron', monospace; font-size: 13px;
+    letter-spacing: 8px; color: var(--muted); margin-top: 8px; text-transform: uppercase;
+  }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 4px;
+    padding: 40px 36px; width: 100%; max-width: 480px; position: relative;
+    box-shadow: 0 0 60px rgba(0,255,136,0.06), inset 0 1px 0 rgba(0,255,136,0.08);
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 20px; right: 20px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+  }
+  .card-title {
+    font-family: 'Orbitron', monospace; font-size: 13px; letter-spacing: 4px;
+    color: var(--green); text-transform: uppercase; margin-bottom: 30px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card-title::before { content: ''; width: 20px; height: 1px; background: var(--green); }
+
+  .field { margin-bottom: 20px; }
+  .field label {
+    display: block; font-size: 11px; letter-spacing: 3px; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 8px; font-weight: 600;
+  }
+  .field input, .field select {
+    width: 100%; background: rgba(0,255,136,0.03); border: 1px solid rgba(0,255,136,0.15);
+    border-radius: 2px; padding: 13px 16px; color: var(--text);
+    font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 500;
+    outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    -webkit-appearance: none;
+  }
+  .field input::placeholder { color: var(--muted); opacity: 0.5; }
+  .field input:focus, .field select:focus {
+    border-color: var(--green); background: rgba(0,255,136,0.06);
+    box-shadow: 0 0 0 2px rgba(0,255,136,0.08);
+  }
+  .field select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2300ff88' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px;
+  }
+  .field select option { background: #0b141d; color: var(--text); }
+
+  .btn {
+    width: 100%; padding: 15px; background: var(--green); color: #050a0f; border: none;
+    border-radius: 2px; font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase; cursor: pointer; margin-top: 8px;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .btn::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  }
+  .btn:hover { background: var(--accent); box-shadow: 0 0 30px rgba(0,255,136,0.4); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-outline {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-size: 11px; letter-spacing: 3px; padding: 10px; margin-top: 12px;
+  }
+  .btn-outline:hover { border-color: var(--green); color: var(--green); background: transparent; box-shadow: none; }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 8px var(--green); display: inline-block; animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+  /* PAGE 2 */
+  #page2.active { flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 0; }
+
+  .dash-nav {
+    background: rgba(5,10,15,0.95); border-bottom: 1px solid var(--border);
+    padding: 14px 30px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px);
+  }
+  .nav-logo { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; color: var(--green); text-shadow: 0 0 20px rgba(0,255,136,0.4); letter-spacing: 2px; }
+  .nav-logo span { color: var(--accent); }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .nav-badge { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+  .nav-user { font-family: 'Orbitron', monospace; font-size: 12px; color: var(--green); letter-spacing: 2px; }
+
+  .dash-body { padding: 30px; max-width: 960px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 28px; }
+
+  .sec-label {
+    font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 4px;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .balance-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 4px;
+    padding: 30px; position: relative; overflow: hidden;
+  }
+  .balance-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+  }
+  .balance-card::after {
+    content: ''; position: absolute; bottom: -40px; right: -40px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .exness-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,255,136,0.06); border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 2px; padding: 6px 12px; font-size: 11px; letter-spacing: 3px;
+    color: var(--green); text-transform: uppercase; margin-bottom: 20px;
+  }
+  .exness-badge .dot { width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); animation: pulse 2s infinite; }
+
+  .balance-row { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  .balance-label { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .balance-amount { font-family: 'Orbitron', monospace; font-size: clamp(32px, 5vw, 52px); font-weight: 900; color: var(--green); text-shadow: 0 0 30px rgba(0,255,136,0.3); line-height: 1; }
+  .balance-amount .currency { font-size: 0.45em; opacity:0.6; margin-right:4px; vertical-align:super; }
+  .balance-stats { display: flex; flex-direction: column; gap: 10px; text-align: right; }
+  .stat-label { font-size: 10px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; }
+  .stat-val { font-family:'Orbitron',monospace; font-size:14px; color:var(--text); font-weight:600; }
+  .stat-val.green { color:var(--green); }
+  .stat-val.red { color:var(--danger); }
+
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .info-tile { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 20px; }
+  .info-tile-label { font-size:10px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:8px; }
+  .info-tile-val { font-family:'Orbitron',monospace; font-size:15px; color:var(--text); font-weight:600; }
+
+  .profile-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 24px 28px; display: flex; align-items: center; gap: 20px; }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 900;
+    color: #050a0f; flex-shrink: 0; box-shadow: 0 0 20px rgba(0,255,136,0.3);
+  }
+  .profile-name { font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: 2px; }
+  .profile-meta { font-size:12px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-top:4px; }
+
+  .deposit-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 30px; position: relative; }
+  .deposit-card::before {
+    content: ''; position: absolute; top: 0; left: 20px; right: 20px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,255,136,0.3), transparent);
+  }
+
+  .dep-field label { display: block; font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+
+  /* USDT copy box */
+  .usdt-copy-wrap {
+    display: flex; align-items: center; border: 1px solid rgba(0,255,136,0.25);
+    border-radius: 2px; overflow: hidden; margin-bottom: 8px;
+  }
+  .usdt-display {
+    flex: 1; padding: 13px 14px; font-family: 'Rajdhani', monospace; font-size: 13px;
+    color: var(--green); background: rgba(0,255,136,0.04); letter-spacing: 1px;
+    word-break: break-all; user-select: all;
+  }
+  .copy-btn {
+    padding: 13px 18px; background: rgba(0,255,136,0.1); border: none;
+    border-left: 1px solid rgba(0,255,136,0.2); color: var(--green);
+    font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; cursor: pointer; transition: background 0.2s, color 0.2s;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .copy-btn:hover { background: rgba(0,255,136,0.2); }
+  .copy-btn.copied { color: var(--accent); background: rgba(0,255,204,0.15); }
+  .usdt-note { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; opacity: 0.6; margin-top: 4px; }
+
+  .usdt-badge {
+    display:inline-flex; align-items:center; gap:6px; background:rgba(38,161,123,0.1);
+    border:1px solid rgba(38,161,123,0.25); border-radius:2px; padding:4px 10px;
+    font-size:11px; letter-spacing:2px; color:#26a17b; text-transform:uppercase; margin-bottom:16px;
+  }
+
+  .other-crypto-divider {
+    display: flex; align-items: center; gap: 12px; margin: 20px 0 16px;
+    color: var(--muted); font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  }
+  .other-crypto-divider::before, .other-crypto-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .other-crypto-btn {
+    width: 100%; padding: 14px; background: transparent; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px; color: var(--muted); font-family: 'Orbitron', monospace;
+    font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+    cursor: not-allowed; opacity: 0.45;
+  }
+  .other-crypto-note { text-align: center; margin-top: 10px; font-size: 11px; letter-spacing: 2px; color: var(--muted); opacity: 0.5; text-transform: uppercase; }
+
+  .back-link { text-align: center; margin-top: 4px; font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; cursor: pointer; transition: color 0.2s; }
+  .back-link:hover { color: var(--danger); }
+
+  .fade-in { animation: fadeIn 0.5s ease forwards; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .fade-in-delay { animation: fadeIn 0.5s ease 0.15s forwards; opacity:0; }
+  .fade-in-delay2 { animation: fadeIn 0.5s ease 0.3s forwards; opacity:0; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<section id="page1" class="page active">
+  <div class="brand fade-in">
+    <div class="brand-tag">Trading Automation</div>
+    <div class="brand-name">TINGA TINGA <span>NEW</span></div>
+    <div class="brand-sub">Connect Bot</div>
+  </div>
+
+  <div class="card fade-in-delay">
+    <div class="card-title">Bot Configuration</div>
+
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="inp-name" placeholder="Enter your full name" />
+    </div>
+    <div class="field">
+      <label>Login Number</label>
+      <input type="text" id="inp-login" placeholder="e.g. 12345678" />
+    </div>
+    <div class="field">
+      <label>Server Name</label>
+      <input type="text" id="inp-server" placeholder="e.g. Exness-MT5Real" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="inp-pass" placeholder="••••••••••••" />
+    </div>
+    <div class="field">
+      <label>Type</label>
+      <select id="inp-type">
+        <option value="" disabled selected>Select account type</option>
+        <option value="standard">Standard</option>
+        <option value="professional">Professional</option>
+      </select>
+    </div>
+
+    <button class="btn" onclick="connectBot()">Connect Bot</button>
+    <button class="btn btn-outline">Cancel</button>
+  </div>
+</section>
+
+<!-- PAGE 2 -->
+<section id="page2" class="page">
+  <nav class="dash-nav">
+    <div class="nav-logo">TINGA <span>TINGA</span></div>
+    <div class="nav-right">
+      <div class="nav-badge"><span class="status-dot"></span> Live</div>
+      <div class="nav-user" id="nav-username">USER</div>
+    </div>
+  </nav>
+
+  <div class="dash-body">
+
+    <!-- Balance -->
+    <div class="fade-in">
+      <div class="sec-label">Exness Account</div>
+      <div class="balance-card">
+        <div class="exness-badge">
+          <span class="dot"></span>
+          Third-party app connected · Exness
+        </div>
+        <div class="balance-row">
+          <div class="balance-main">
+            <div class="balance-label">Account Balance</div>
+            <div class="balance-amount"><span class="currency">$</span>0.00 <span style="font-size:0.3em;letter-spacing:3px;color:var(--muted);vertical-align:middle;">USD</span></div>
+          </div>
+          <div class="balance-stats">
+            <div class="stat-item">
+              <div class="stat-label">Equity</div>
+              <div class="stat-val green">$0.00 USD</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Floating P/L</div>
+              <div class="stat-val green">+$0.00 USD</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Margin Used</div>
+              <div class="stat-val red">$0.00 USD</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info tiles -->
+    <div class="fade-in-delay">
+      <div class="info-grid">
+        <div class="info-tile">
+          <div class="info-tile-label">Server</div>
+          <div class="info-tile-val" id="d-server">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="info-tile-label">Account Type</div>
+          <div class="info-tile-val" id="d-type">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="info-tile-label">Login</div>
+          <div class="info-tile-val" id="d-login">—</div>
+        </div>
+        <div class="info-tile">
+          <div class="info-tile-label">Status</div>
+          <div class="info-tile-val" style="color:var(--green);">Active</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="fade-in-delay2">
+      <div class="sec-label">Account Holder</div>
+      <div class="profile-card">
+        <div class="avatar" id="avatar-initials">?</div>
+        <div class="profile-info">
+          <div class="profile-name" id="d-name">—</div>
+          <div class="profile-meta">Tinga Tinga Trader · Bot Active</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deposit -->
+    <div class="fade-in-delay2">
+      <div class="sec-label">Deposit</div>
+      <div class="deposit-card">
+        <div class="usdt-badge">⬡ USDT · TRC20 / ERC20</div>
+        <div class="dep-field" style="margin-bottom:8px;">
+          <label>Send USDT to this address</label>
+          <div class="usdt-copy-wrap">
+            <span class="usdt-display" id="usdt-static">TKxUeoLHaDsNdmCyJzhUZzwzehHCJKCQWi/span>
+            <button class="copy-btn" onclick="copyAddress()" id="copy-btn">Copy</button>
+          </div>
+          <div class="usdt-note">Only send USDT (TRC20 / ERC20) to this address</div>
+        </div>
+        <div class="other-crypto-divider"><span>or</span></div>
+        <button class="other-crypto-btn" disabled>Deposit Other Crypto</button>
+        <div class="other-crypto-note">BTC · ETH · BNB · SOL and more — coming soon</div>
+      </div>
+    </div>
+
+    <div class="back-link" onclick="goBack()">← Disconnect Bot</div>
+  </div>
+</section>
+
+<script>
+  function connectBot() {
+    const name   = document.getElementById('inp-name').value.trim();
+    const login  = document.getElementById('inp-login').value.trim();
+    const server = document.getElementById('inp-server').value.trim();
+    const type   = document.getElementById('inp-type').value;
+
+    if (!name || !login || !server || !type) {
+      alert('Please fill in all fields before connecting.');
+      return;
+    }
+
+    document.getElementById('d-name').textContent    = name;
+    document.getElementById('d-server').textContent  = server;
+    document.getElementById('d-login').textContent   = login;
+    document.getElementById('d-type').textContent    = type.charAt(0).toUpperCase() + type.slice(1);
+    document.getElementById('nav-username').textContent = name.split(' ')[0].toUpperCase();
+
+    const initials = name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('avatar-initials').textContent = initials;
+
+    document.getElementById('page1').classList.remove('active');
+    document.getElementById('page2').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function copyAddress() {
+    const addr = document.getElementById('usdt-static').textContent;
+    navigator.clipboard.writeText(addr).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function goBack() {
+    document.getElementById('page2').classList.remove('active');
+    document.getElementById('page1').classList.add('active');
+  }
+</script>
+</body>
+</html>
